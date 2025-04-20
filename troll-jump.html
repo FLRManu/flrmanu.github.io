@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Troll Jump - Beta</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+    }
+    canvas {
+      display: block;
+      margin: auto;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+</head>
+<body>
+  <script>
+    const config = {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      backgroundColor: "#222",
+      physics: {
+        default: "arcade",
+        arcade: {
+          gravity: { y: 600 },
+          debug: false
+        }
+      },
+      scene: {
+        preload,
+        create,
+        update
+      }
+    };
+
+    let player, cursors;
+    let platform, fakeZone, spikes;
+    let gameOver = false;
+
+    const game = new Phaser.Game(config);
+
+    function preload() {}
+
+    function create() {
+      // Piso largo
+      platform = this.physics.add.staticGroup();
+      platform.create(400, 580, "ground").setScale(8, 1).refreshBody();
+
+      // Jugador: rectángulo vertical
+      player = this.add.rectangle(100, 500, 20, 40, 0x00ffcc);
+      this.physics.add.existing(player);
+      player.body.setCollideWorldBounds(true);
+
+      // Colisión con piso
+      this.physics.add.collider(player, platform);
+
+      // Zona falsa en el centro del piso
+      fakeZone = this.add.zone(400, 570, 100, 20);
+      this.physics.add.existing(fakeZone);
