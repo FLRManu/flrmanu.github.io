@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sandwich Clicker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #fdf6e3;
+      color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background-color: #222;
+      color: #eee;
+    }
+
+    #sandwich {
+      width: 200px;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    #sandwich:active {
+      transform: scale(1.1);
+    }
+
+    .store {
+      margin-top: 20px;
+    }
+
+    .upgrade {
+      margin: 10px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffc107;
+      color: #000;
+      cursor: pointer;
+    }
+
+    .upgrade:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    #theme-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    #achievements {
+      margin-top: 20px;
+      text-align: left;
+      padding-left: 20px;
+    }
+
+    .achievement {
+      color: #aaa;
+    }
+
+    .achievement.unlocked {
+      color: #4CAF50;
+    }
+
+    #progress-bar {
+      height: 20px;
+      background-color: #ddd;
+      margin: 20px;
+      border-radius: 10px;
+      width: 100%;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0;
+      background-color: #4CAF50;
+      border-radius: 10px;
+    }
+
+    .popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="theme-toggle">🌙</button>
+  <h1>🥪 Sandwich Clicker 🥪</h1>
+  <p><strong>Sándwiches:</strong> <span id="counter">0</span></p>
+  
+  <img id="sandwich" src="https://openmoji.org/data/color/svg/1F96A.svg" alt="Sandwich">
+  
+  <div id="progress-bar">
+    <div id="progress"></div>
+  </div>
+
+  <div class="store">
+    <h2>🛒 Tienda</h2>
+    <button class="upgrade" id="upgrade-click" disabled>Pan Integral (x2 clic) – 20 🥪</button>
+    <button class="upgrade" id="autoclicker" disabled>AutoToaster (1/s) – 50 🥪</button>
+  </div>
+
+  <div id="achievements">
+    <h2>🎖️ Logros</h2>
+    <p id="achievement-1" class="achievement">🍞 Primer Mordisco</p>
+    <p id="achievement-2" class="achievement">🥓 Pan con Todo</p>
+    <p id="achievement-3" class="achievement">🧀 Maestro del Sandwich</p>
+    <p id="achievement-4" class="achievement">🔥 Crocante Legendario</p>
+  </div>
+
+  <div id="popup" class="popup">¡Logro Desbloqueado!</div>
+
+  <script>
+    let sandwiches = parseInt(localStorage.getItem("sandwiches")) || 0;
+    let clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
+    let hasAutoClicker = localStorage.getItem("hasAutoClicker") === "true";
+    let progress = document.getElementById("progress");
+    const counter = document.getElementById("counter");
+    const sandwich = document.getElementById("sandwich");
+    const upgradeClick = document.getElementById("upgrade-click");
+    const autoclicker = document.getElementById("autoclicker");
+    const themeToggle = document.getElementById("theme-toggle");
+    const popup = document.getElementById("popup");
+
+    const achievements = {
+      1: false,
+      2: false,
+      3: false,
+      4: false
+    };
+
+    function updateUI() {
+      counter.textContent = sandwiches;
+      upgradeClick.disabled = sandwiches < 20 || clickPower > 1;
+      autoclicker.disabled = sandwiches < 50 || hasAutoClicker;
+
+      // Barra de progreso
+      let progressPercentage = (sandwiches % 100) / 100 * 100;
+      progress.style.width = `${progressPercentage}%`;
+
+      // Actualizar logros
+      if (sandwiches >= 1 && !achievements[1]) {
+        achievements[1] = true;
+        document.getElementById("achievement-1").classList.add("unlocked");
+        showPopup("¡Primer Mordisco!");
+      }
+
+      if (sandwiches >= 20 && !achievements[2]) {
+        achievements[2] = true;
+        document.getElementById("achievement-2").classList.add("unlocked");
+        showPopup("¡Pan con Todo!");
+      }
+
+      if (sandwiches >= 100 && !achievements[3]) {
+        achievements[3] = true;
+        document.getElementById("achievement-3").classList.add("unlocked");
+        showPopup("¡Maestro del Sandwich!");
+      }
+
+      if (sandwiches >= 500 && !achievements[4]) {
+        achievements[4] = true;
+        document.getElementById("achievement-4").classList.add("unlocked");
+        showPopup("¡Crocante Legendario!");
+      }
+
+      saveGame();
+    }
+
+    function saveGame() {
+      localStorage.setItem("sandwiches", sandwiches);
+      localStorage.setItem("clickPower", clickPower);
+      localStorage.setItem("hasAutoClicker", hasAutoClicker);
+    }
+
+    function showPopup(message) {
+      popup.textContent = message;
+      popup.style.display = "block";
+      setTimeout(() => popup.style.display = "none", 2000);
+    }
+
+    sandwich.addEventListener("click", () => {
+      sandwiches += clickPower;
+      updateUI();
+      playClickSound();
+    });
+
+    upgradeClick.addEventListener("click", () => {
+      if (sandwiches >= 20 && clickPower === 1) {
+        sandwiches -= 20;
+        clickPower = 2;
+        updateUI();
+      }
+    });
+
+    autoclicker.addEventListener("click", () => {
+      if (sandwiches >= 50 && !hasAutoClicker) {
+        sandwiches -= 50;
+        hasAutoClicker = true;
+        setInterval(() => {
+          sandwiches += 1;
+          updateUI();
+        }, 1000);
+        updateUI();
+      }
+    });
+
+    // Tema claro/oscuro
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      themeToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+    });
+
+    // Sonido de clic
+    function playClickSound() {
+      const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
+      audio.play();
+    }
+
+    // Si ya tenías autoclicker activado
+    if (hasAutoClicker) {
+      setInterval(() => {
+        sandwiches += 1;
+        updateUI();
+      }, 1000);
+    }
+
+    updateUI();
+  </script>
+
+</body>
+</html>
