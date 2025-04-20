@@ -2,24 +2,32 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manu's Sandbox</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-   <header>
-    <h1>Manu's Sandbox</h1>
-    <p>Un lugar para experimentar y crear cosas cool 🧪✨</p>
-    <button id="darkModeToggle">🌙 Cambiar a modo oscuro</button>
-</header>
-
+    <header>
+        <h1>Manu's Sandbox</h1>
+        <p>Un lugar para experimentar y crear cosas cool 🧪✨</p>
+        <button id="darkModeToggle">🌙 Cambiar a modo oscuro</button>
+    </header>
 
     <section>
         <h2>¿Qué es esto?</h2>
         <p>Bienvenido a mi sandbox. Aquí pruebo ideas, diseños y cosas locas con código.</p>
+        <div id="colorChangeSection">
+            <h2>Haz clic en este texto para cambiar el color</h2>
+        </div>
     </section>
 
     <footer>
-        <p>© FLRManu 2025</p>
+        <p>© Manu 2025</p>
+        <p id="visitCounter">Número de visitas: 0</p>
     </footer>
+
+    <div id="loader" class="loader"></div>
+
+    <script src="script.js"></script>
 </body>
 </html>
